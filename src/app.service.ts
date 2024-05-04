@@ -28,7 +28,7 @@ export class CameraService {
         '-segment_list_type csv',
         '-segment_format mp4',
       ])
-      .output(stream)
+      .output('pipe:1')
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
