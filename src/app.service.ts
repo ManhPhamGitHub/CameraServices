@@ -55,8 +55,10 @@ export class CameraService {
         '-map 0',
         '-reset_timestamps 1',
         '-strftime 1',
-        '/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H-%M-%S.mp4',
       ])
+      .output(
+        '/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H-%M-%S.mp4',
+      )
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
