@@ -29,7 +29,7 @@ export class CameraService {
         '-segment_format mp4',
       ])
       .output('pipe:1')
-      .on('error', (err: Error) => { // Explicitly define the type of 'err' parameter
+      .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
       });
@@ -38,23 +38,22 @@ export class CameraService {
     ffmpegProcess.run();
 
     // Upload hourly segments to Cloudinary
-    ffmpegProcess.on('data', (data: Buffer) => { // Remove 'async' keyword as it is not needed
+    ffmpegProcess.on('data', (data: Buffer) => {
       console.log('222222222222222222222222', data);
-    });
 
-    const timestamp = Date.now();
-    const folderName = new Date(timestamp)
-      .toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      })
+      const timestamp = Date.now();
+      const folderName = new Date(timestamp)
+        .toLocaleDateString('en-US', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        })
         .replace(/\//g, '-'); // Format: day-month-year
 
       try {
         // Upload segment to Cloudinary
 
-        const result = await Cloudinary.uploader
+        Cloudinary.uploader
           .upload_stream(
             { resource_type: 'video', folder: folderName },
             (error, result) => {
@@ -73,6 +72,6 @@ export class CameraService {
       }
     });
 
-    return ffmpegProcess;
+    // return ffmpegProcess;
   }
 }
