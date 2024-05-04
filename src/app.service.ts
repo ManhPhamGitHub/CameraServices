@@ -14,14 +14,15 @@ export class CameraService {
     });
   }
 
-  async startStreaming(cameraUrl: string): Promise<any> {
+  async startStreaming(cameraUrl: string): Promise<void> {
     const stream = new PassThrough();
 
-    // Create an ffmpeg process to read from camera URL
-    const ffmpegProcess = ffmpeg()
-      .input(cameraUrl)
+    // Create an ffmpeg process to read from the camera URL
+    const ffmpegProcess = ffmpeg(cameraUrl)
+      .inputOptions(['-rtsp_transport tcp'])
       .outputOptions([
-        '-c:v copy',
+        '-c:v libx264',
+        '-vf scale=1280:720',
         '-f segment',
         '-segment_time 3600',
         '-segment_list pipe:1',
@@ -34,13 +35,15 @@ export class CameraService {
         stream.end();
       });
 
+    ffmpegProcess.on('start', (commandLine) => {
+      console.log('Spawned FFmpeg with command:', commandLine);
+    });
+
     // Start the ffmpeg process
     ffmpegProcess.run();
 
     // Upload hourly segments to Cloudinary
     ffmpegProcess.on('data', (data: Buffer) => {
-      console.log('222222222222222222222222', data);
-
       const timestamp = Date.now();
       const folderName = new Date(timestamp)
         .toLocaleDateString('en-US', {
@@ -51,8 +54,6 @@ export class CameraService {
         .replace(/\//g, '-'); // Format: day-month-year
 
       try {
-        // Upload segment to Cloudinary
-
         Cloudinary.uploader
           .upload_stream(
             { resource_type: 'video', folder: folderName },
@@ -72,6 +73,6 @@ export class CameraService {
       }
     });
 
-    // return ffmpegProcess;
+    // Handle cleanup or additional logic as needed
   }
 }
