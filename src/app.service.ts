@@ -23,7 +23,7 @@ export class CameraService {
       .outputOptions([
         '-c:v libx264',
         '-vf scale=1280:720',
-        '-f segment',
+        '-f mp4',
         '-segment_time 3600',
         '-segment_list pipe:1',
         '-segment_list_type csv',
