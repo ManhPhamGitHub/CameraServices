@@ -29,7 +29,9 @@ export class CameraService {
         '-segment_list_type csv',
         '-segment_format mp4',
       ])
-      .output('/root/manhpham/CameraServices/storage/%Y-%m-%d_%H-%M-%S.mp4')
+      .output(
+        '/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H-%M-%S.mp4',
+      )
       // .output('pipe:1')
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
