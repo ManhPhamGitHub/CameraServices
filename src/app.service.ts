@@ -29,7 +29,8 @@ export class CameraService {
         '-segment_list_type csv',
         '-segment_format mp4',
       ])
-      .output('pipe:1')
+      .output('/root/manhpham/CameraServices/storage/%Y-%m-%d_%H-%M-%S.mp4')
+      // .output('pipe:1')
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
@@ -43,35 +44,35 @@ export class CameraService {
     ffmpegProcess.run();
 
     // Upload hourly segments to Cloudinary
-    ffmpegProcess.on('data', (data: Buffer) => {
-      const timestamp = Date.now();
-      const folderName = new Date(timestamp)
-        .toLocaleDateString('en-US', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-        })
-        .replace(/\//g, '-'); // Format: day-month-year
+    // ffmpegProcess.on('data', (data: Buffer) => {
+    //   const timestamp = Date.now();
+    //   const folderName = new Date(timestamp)
+    //     .toLocaleDateString('en-US', {
+    //       day: '2-digit',
+    //       month: '2-digit',
+    //       year: 'numeric',
+    //     })
+    //     .replace(/\//g, '-'); // Format: day-month-year
 
-      try {
-        Cloudinary.uploader
-          .upload_stream(
-            { resource_type: 'video', folder: folderName },
-            (error, result) => {
-              if (error) {
-                console.error('Error uploading segment to Cloudinary:', error);
-              } else {
-                console.log(
-                  `Segment uploaded to Cloudinary successfully: ${result.secure_url}`,
-                );
-              }
-            },
-          )
-          .end(data);
-      } catch (error) {
-        console.error('Error uploading segment to Cloudinary:', error);
-      }
-    });
+    //   try {
+    //     Cloudinary.uploader
+    //       .upload_stream(
+    //         { resource_type: 'video', folder: folderName },
+    //         (error, result) => {
+    //           if (error) {
+    //             console.error('Error uploading segment to Cloudinary:', error);
+    //           } else {
+    //             console.log(
+    //               `Segment uploaded to Cloudinary successfully: ${result.secure_url}`,
+    //             );
+    //           }
+    //         },
+    //       )
+    //       .end(data);
+    //   } catch (error) {
+    //     console.error('Error uploading segment to Cloudinary:', error);
+    //   }
+    // });
 
     // Handle cleanup or additional logic as needed
   }

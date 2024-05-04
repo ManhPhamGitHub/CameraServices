@@ -71,3 +71,18 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+## ffmepg command
+
+ffmpeg -rtsp*transport tcp -i "rtsp://rtsp-test-server.viomic.com:554/stream" \
+ -c:v libx264 \
+ -vf "scale=1280:720" \
+ -f segment \
+ -segment_time 3600 \
+ -segment_list pipe:1 \
+ -segment_list_type csv \
+ -segment_format mp4 \
+ -map 0 \
+ -reset_timestamps 1 \
+ -strftime 1 \
+ "/root/manhpham/CameraServices/storage/%Y-%m-%d*%H-%M-%S.mp4"
