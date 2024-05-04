@@ -7,7 +7,7 @@ export class AppController {
 
   @Get()
   async getHello() {
-    const cameraUrl = '/home/manhpd/manh.pd/test/CameraServices/project-name/src/assest/chillies.mp4';
+	const cameraUrl = 'rtsp://rtsp-test-server.viomic.com:554/stream'
     await this.appService.startStreaming(cameraUrl);
   }
 }
