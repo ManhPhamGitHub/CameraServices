@@ -86,3 +86,4 @@ ffmpeg -rtsp*transport tcp -i "rtsp://rtsp-test-server.viomic.com:554/stream" \
  -reset_timestamps 1 \
  -strftime 1 \
  "/root/manhpham/CameraServices/storage/%Y-%m-%d*%H-%M-%S.mp4"
+

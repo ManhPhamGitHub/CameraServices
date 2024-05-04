@@ -18,7 +18,31 @@ export class CameraService {
     const stream = new PassThrough();
 
     // Create an ffmpeg process to read from the camera URL
-    const ffmpegProcess = ffmpeg(cameraUrl)
+    // const ffmpegProcess = ffmpeg(cameraUrl)
+    //   .inputOptions(['-rtsp_transport tcp'])
+    //   .outputOptions([
+    //     '-c:v libx264',
+    //     '-vf scale=1280:720',
+    //     '-f segment',
+    //     '-segment_time 3600',
+    //     '-segment_list pipe:1',
+    //     '-segment_list_type csv',
+    //     '-segment_format mp4',
+    //   ])
+    //   .output('pipe:1')
+    //   .on('error', (err) => {
+    //     console.error('FFmpeg error:', err);
+    //     stream.end();
+    //   });
+
+    // ffmpegProcess.on('start', (commandLine) => {
+    //   console.log('Spawned FFmpeg with command:', commandLine);
+    // });
+
+    // // Start the ffmpeg process
+    // ffmpegProcess.run();
+
+    const ffmpegCommand = ffmpeg(cameraUrl)
       .inputOptions(['-rtsp_transport tcp'])
       .outputOptions([
         '-c:v libx264',
@@ -28,22 +52,22 @@ export class CameraService {
         '-segment_list pipe:1',
         '-segment_list_type csv',
         '-segment_format mp4',
-      ])
-      .output(
+        '-map 0',
+        '-reset_timestamps 1',
+        '-strftime 1',
         '/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H-%M-%S.mp4',
-      )
-      // .output('pipe:1')
+      ])
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
+        // reject(err); // Reject the promise on error
+      })
+      .on('end', () => {
+        console.log('FFmpeg process finished');
+        // resolve(); // Resolve the promise on completion
       });
 
-    ffmpegProcess.on('start', (commandLine) => {
-      console.log('Spawned FFmpeg with command:', commandLine);
-    });
-
-    // Start the ffmpeg process
-    ffmpegProcess.run();
+    ffmpegCommand.run(stream);
 
     // Upload hourly segments to Cloudinary
     // ffmpegProcess.on('data', (data: Buffer) => {
