@@ -20,15 +20,10 @@ export class CameraService {
     const ffmpegProcess = ffmpeg(cameraUrl)
       .inputOptions(['-rtsp_transport tcp'])
       .outputOptions([
-        '-c:v libx264',
-        '-vf scale=1280:720',
-        '-f segment',
-        '-segment_time 3600',
-        '-segment_list pipe:1',
-        '-segment_list_type csv',
-        '-segment_format mp4',
+        '-c:v copy', // Use a copy codec for video (no re-encoding)
+        '-f mp4', // Output format as mp4
       ])
-      .output('pipe:1')
+      .output(stream)
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
