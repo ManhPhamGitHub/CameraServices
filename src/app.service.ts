@@ -15,7 +15,15 @@ export class CameraService {
 
   async startStreaming(cameraUrl: string): Promise<void> {
     const stream = new PassThrough();
+    const currentDate = new Date();
+    const formattedDate = currentDate
+      .toISOString()
+      .slice(0, 19)
+      .replace(/[-T:]/g, '_');
+    const fileName = `output_${formattedDate}.mp4`;
 
+    // Upload the recorded MP4 file to Cloudinary with the generated filename
+    const filePath = `/root/manhpham/CameraServices/storage/${fileName}`;
     // Create an ffmpeg process to read from the camera URL
     const ffmpegCommand = ffmpeg(cameraUrl)
       .inputOptions(['-rtsp_transport tcp'])
@@ -31,30 +39,28 @@ export class CameraService {
         '-reset_timestamps 1',
         '-strftime 1',
       ])
-      .output(
-        '/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H-%M-%S.mp4',
-      )
+      .output('/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H.mp4')
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
         // reject(err); // Reject the promise on error
       })
-      .on('end', () => {
+      .on('start', (commandLine) => {
+        console.log('Spawned FFmpeg with command:', commandLine);
+      })
+      .on('end', async () => {
         console.log('FFmpeg process finished');
         // resolve(); // Resolve the promise on completion
+        try {
+          // Upload the recorded MP4 file to Cloudinary
+          await this.uploadToCloudinary(filePath);
+          // Handle Cloudinary upload result as needed
+        } catch (err) {
+          console.error('Error uploading to Cloudinary:', err);
+        }
       });
 
     await ffmpegCommand.run(stream);
-
-    // const timestamp = Date.now();
-    // const folderName = new Date(timestamp)
-    //   .toLocaleDateString('en-US', {
-    //     day: '2-digit',
-    //     month: '2-digit',
-    //     year: 'numeric',
-    //   })
-    //   .replace(/\//g, '-'); // Format: day-month-year
-    // console.log('folderName', folderName);
 
     // try {
     //   Cloudinary.uploader
@@ -78,6 +84,24 @@ export class CameraService {
 
     // Handle cleanup or additional logic as needed
   }
+
+  uploadToCloudinary = (filePath) => {
+    return new Promise((resolve, reject) => {
+      Cloudinary.uploader.upload(
+        filePath,
+        { resource_type: 'video' },
+        (error, result) => {
+          if (error) {
+            console.error('Error uploading to Cloudinary:', error);
+            reject(error);
+          } else {
+            console.log('Upload to Cloudinary successful:', result);
+            resolve(result);
+          }
+        },
+      );
+    });
+  };
 }
 
 // const ffmpegProcess = ffmpeg(cameraUrl)
