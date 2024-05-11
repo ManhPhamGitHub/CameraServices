@@ -17,7 +17,7 @@ export class CameraService {
     const stream = new PassThrough();
 
     // Create an ffmpeg process to read from the camera URL
-    const ffmpegProcess = ffmpeg(cameraUrl)
+    const ffmpegCommand = ffmpeg(cameraUrl)
       .inputOptions(['-rtsp_transport tcp'])
       .outputOptions([
         '-c:v libx264',
@@ -27,83 +27,83 @@ export class CameraService {
         '-segment_list pipe:1',
         '-segment_list_type csv',
         '-segment_format mp4',
+        '-map 0',
+        '-reset_timestamps 1',
+        '-strftime 1',
       ])
-      .output('pipe:1')
+      .output(
+        '/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H-%M-%S.mp4',
+      )
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
+        // reject(err); // Reject the promise on error
+      })
+      .on('end', () => {
+        console.log('FFmpeg process finished');
+        // resolve(); // Resolve the promise on completion
       });
 
-    ffmpegProcess.on('start', (commandLine) => {
-      console.log('Spawned FFmpeg with command:', commandLine);
-    });
+    await ffmpegCommand.run(stream);
 
-    // Start the ffmpeg process
-    ffmpegProcess.run();
+    // const timestamp = Date.now();
+    // const folderName = new Date(timestamp)
+    //   .toLocaleDateString('en-US', {
+    //     day: '2-digit',
+    //     month: '2-digit',
+    //     year: 'numeric',
+    //   })
+    //   .replace(/\//g, '-'); // Format: day-month-year
+    // console.log('folderName', folderName);
 
-    // Upload hourly segments to Cloudinary
-    ffmpegProcess.on('data', (data: Buffer) => {
-      console.log('data received ', data);
-
-      // const timestamp = Date.now();
-      // const folderName = new Date(timestamp)
-      //   .toLocaleDateString('en-US', {
-      //     day: '2-digit',
-      //     month: '2-digit',
-      //     year: 'numeric',
-      //   })
-      //   .replace(/\//g, '-'); // Format: day-month-year
-      // console.log('folderName', folderName);
-
-      // try {
-      //   Cloudinary.uploader
-      //     .upload_stream(
-      //       { resource_type: 'video', folder: folderName },
-      //       (error, result) => {
-      //         if (error) {
-      //           console.error('Error uploading segment to Cloudinary:', error);
-      //         } else {
-      //           console.log(
-      //             `Segment uploaded to Cloudinary successfully: ${result.secure_url}`,
-      //           );
-      //         }
-      //       },
-      //     )
-      //     .end(data);
-      // } catch (error) {
-      //   console.error('Error uploading segment to Cloudinary:', error);
-      // }
-    });
+    // try {
+    //   Cloudinary.uploader
+    //     .upload_stream(
+    //       { resource_type: 'video', folder: folderName },
+    //       (error, result) => {
+    //         if (error) {
+    //           console.error('Error uploading segment to Cloudinary:', error);
+    //         } else {
+    //           console.log(
+    //             `Segment uploaded to Cloudinary successfully: ${result.secure_url}`,
+    //           );
+    //         }
+    //       },
+    //     )
+    //     .end(data);
+    // } catch (error) {
+    //   console.error('Error uploading segment to Cloudinary:', error);
+    // }
+    // });
 
     // Handle cleanup or additional logic as needed
   }
 }
 
-// const ffmpegCommand = ffmpeg(cameraUrl)
-//   .inputOptions(['-rtsp_transport tcp'])
-//   .outputOptions([
-//     '-c:v libx264',
-//     '-vf scale=1280:720',
-//     '-f segment',
-//     '-segment_time 3600',
-//     '-segment_list pipe:1',
-//     '-segment_list_type csv',
-//     '-segment_format mp4',
-//     '-map 0',
-//     '-reset_timestamps 1',
-//     '-strftime 1',
-//   ])
-//   .output(
-//     '/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H-%M-%S.mp4',
-//   )
-//   .on('error', (err) => {
-//     console.error('FFmpeg error:', err);
-//     stream.end();
-//     // reject(err); // Reject the promise on error
-//   })
-//   .on('end', () => {
-//     console.log('FFmpeg process finished');
-//     // resolve(); // Resolve the promise on completion
-//   });
+// const ffmpegProcess = ffmpeg(cameraUrl)
+//       .inputOptions(['-rtsp_transport tcp'])
+//       .outputOptions([
+//         '-c:v libx264',
+//         '-vf scale=1280:720',
+//         '-f segment',
+//         '-segment_time 3600',
+//         '-segment_list pipe:1',
+//         '-segment_list_type csv',
+//         '-segment_format mp4',
+//       ])
+//       .output('pipe:1')
+//       .on('error', (err) => {
+//         console.error('FFmpeg error:', err);
+//         stream.end();
+//       });
 
-// ffmpegCommand.run(stream);
+//     ffmpegProcess.on('start', (commandLine) => {
+//       console.log('Spawned FFmpeg with command:', commandLine);
+//     });
+
+//     // Start the ffmpeg process
+//     ffmpegProcess.run();
+
+//     // Upload hourly segments to Cloudinary
+//     ffmpegProcess.on('data', (data: Buffer) => {
+//       console.log('data received ', data);
