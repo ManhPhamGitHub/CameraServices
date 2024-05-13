@@ -16,10 +16,13 @@ export class CameraService {
   async startStreaming(cameraUrl: string): Promise<void> {
     const stream = new PassThrough();
     const currentDate = new Date();
-    const formattedDate = currentDate
-      .toISOString()
-      .slice(0, 19)
-      .replace(/[-T:]/g, '_');
+
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-based
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const hours = String(currentDate.getHours()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day}_${hours}`;
     const fileName = `output_${formattedDate}.mp4`;
 
     // Upload the recorded MP4 file to Cloudinary with the generated filename
@@ -131,3 +134,18 @@ export class CameraService {
 //     // Upload hourly segments to Cloudinary
 //     ffmpegProcess.on('data', (data: Buffer) => {
 //       console.log('data received ', data);
+
+// Spawned FFmpeg with command: ffmpeg -rtsp_transport tcp -i rtsp://rtsp-test-server.viomic.com:554/stream -y -c:v libx264 -vf scale=1280:720 -f segment -segment_time 120 -segment_list pipe:1 -segment_list_type csv -segment_format mp4 -map 0 -reset_timestamps 1 -strftime 1 /root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H.mp4
+// FFmpeg process finished
+// Error uploading to Cloudinary: [Error: ENOENT: no such file or directory, open '/root/manhpham/CameraServices/storage/output_2024_05_12_09_57_52.mp4'] {
+//   errno: -2,
+//   code: 'ENOENT',
+//   syscall: 'open',
+//   path: '/root/manhpham/CameraServices/storage/output_2024_05_12_09_57_52.mp4'
+// }
+// Error uploading to Cloudinary: [Error: ENOENT: no such file or directory, open '/root/manhpham/CameraServices/storage/output_2024_05_12_09_57_52.mp4'] {
+//   errno: -2,
+//   code: 'ENOENT',
+//   syscall: 'open',
+//   path: '/root/manhpham/CameraServices/storage/output_2024_05_12_09_57_52.mp4'
+// }
