@@ -7,6 +7,6 @@ import { TasksModule } from './tasks/tasks.module';
 @Module({
   controllers: [AppController],
   providers: [CameraService],
-  imports: [ScheduleModule.forRoot(), TasksModule, CameraService],
+  imports: [ScheduleModule.forRoot(), TasksModule],
 })
 export class AppModule {}
