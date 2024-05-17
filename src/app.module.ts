@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { CameraService } from './app.service';
 import { TasksModule } from './tasks/tasks.module';
@@ -6,6 +7,6 @@ import { TasksModule } from './tasks/tasks.module';
 @Module({
   controllers: [AppController],
   providers: [CameraService],
-  imports: [TasksModule],
+  imports: [ScheduleModule.forRoot(), TasksModule],
 })
 export class AppModule {}
