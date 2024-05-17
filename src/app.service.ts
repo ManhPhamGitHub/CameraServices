@@ -11,7 +11,8 @@ export class CameraService {
   constructor() {
     this.storage = new Storage({
       projectId: 'fir-a5cfe',
-      keyFilename: path.join(__dirname, 'secret/fir-a5cfe-b582bda476a7.json'),
+      keyFilename:
+        '/root/manhpham/CameraServices/src/secret/fir-a5cfe-b582bda476a7.json',
     });
   }
 
