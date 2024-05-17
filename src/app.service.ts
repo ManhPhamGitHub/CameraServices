@@ -4,10 +4,13 @@ import { PassThrough } from 'stream';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { v2 as Cloudinary } from 'cloudinary';
 import { Storage } from '@google-cloud/storage';
-import path from 'path';
+import { join } from 'path';
+import * as fs from 'fs';
+
 @Injectable()
 export class CameraService {
   private storage;
+  private bucketName: string = 'ducmanhpham';
   constructor() {
     this.storage = new Storage({
       projectId: 'fir-a5cfe',
@@ -25,11 +28,19 @@ export class CameraService {
     const day = String(currentDate.getDate()).padStart(2, '0');
     const hours = String(currentDate.getHours()).padStart(2, '0');
 
+    const folderPath = join(__dirname, `../storage/${year}-${month}-${day}`);
+
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
+
     const formattedDate = `${year}-${month}-${day}_${hours}`;
     const fileName = `output_${formattedDate}.mp4`;
 
     // Upload the recorded MP4 file to Cloudinary with the generated filename
-    const filePath = `/root/manhpham/CameraServices/storage/${fileName}`;
+    const outputFilePath = join(folderPath, fileName);
+    console.log('outputFilePath', outputFilePath);
+
     // Create an ffmpeg process to read from the camera URL
     const ffmpegCommand = ffmpeg(cameraUrl)
       .inputOptions(['-rtsp_transport tcp'])
@@ -37,15 +48,11 @@ export class CameraService {
         '-c:v libx264',
         '-vf scale=1280:720',
         '-f segment',
-        '-segment_time 120',
-        '-segment_list pipe:1',
-        '-segment_list_type csv',
-        '-segment_format mp4',
-        '-map 0',
+        '-segment_time 3600',
         '-reset_timestamps 1',
         '-strftime 1',
       ])
-      .output('/root/manhpham/CameraServices/storage/output_%Y-%m-%d_%H.mp4')
+      .output(outputFilePath)
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
@@ -59,8 +66,13 @@ export class CameraService {
         // resolve(); // Resolve the promise on completion
         try {
           // Upload the recorded MP4 file to Cloudinary
-          await this.uploadToCloudinary(filePath);
+          await this.uploadToGoogleCloud(
+            outputFilePath,
+            fileName,
+            `${year}-${month}-${day}`,
+          );
           // Handle Cloudinary upload result as needed
+          fs.unlinkSync(outputFilePath);
         } catch (err) {
           console.error('Error uploading to Cloudinary:', err);
         }
@@ -109,12 +121,17 @@ export class CameraService {
     });
   };
 
-  async uploadToGoogleCloudStorage(filePath: string, fileName: string) {
-    const bucketName = 'ducmanhpham';
-    await this.storage.bucket(bucketName).upload(filePath, {
-      destination: fileName,
+  private async uploadToGoogleCloud(
+    filePath: string,
+    fileName: string,
+    folderName: string,
+  ) {
+    const bucket = this.storage.bucket(this.bucketName);
+    const destination = `${folderName}/${fileName}`;
+    await bucket.upload(filePath, {
+      destination,
     });
-    console.log(`File ${fileName} uploaded to ${bucketName}`);
+    console.log(`File uploaded to ${destination}`);
   }
 }
 
