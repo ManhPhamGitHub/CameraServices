@@ -11,10 +11,7 @@ export class CameraService {
   constructor() {
     this.storage = new Storage({
       projectId: 'fir-a5cfe',
-      keyFilename: path.resolve(
-        __dirname,
-        'secret/fir-a5cfe-b582bda476a7.json',
-      ),
+      keyFilename: path.join(__dirname, 'secret/fir-a5cfe-b582bda476a7.json'),
     });
   }
 
