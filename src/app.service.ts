@@ -3,13 +3,18 @@ import { Injectable } from '@nestjs/common';
 import { PassThrough } from 'stream';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { v2 as Cloudinary } from 'cloudinary';
+import { Storage } from '@google-cloud/storage';
+import path from 'path';
 @Injectable()
 export class CameraService {
+  private storage;
   constructor() {
-    Cloudinary.config({
-      cloud_name: 'dlnvlyn5k',
-      api_key: '362136862817161',
-      api_secret: 'FaWl6ohpbr0ZWQOMP7uid38kFi0',
+    this.storage = new Storage({
+      projectId: 'fir-a5cfe',
+      keyFilename: path.resolve(
+        __dirname,
+        'secret/fir-a5cfe-b582bda476a7.json',
+      ),
     });
   }
 
@@ -105,6 +110,14 @@ export class CameraService {
       );
     });
   };
+
+  async uploadToGoogleCloudStorage(filePath: string, fileName: string) {
+    const bucketName = 'ducmanhpham';
+    await this.storage.bucket(bucketName).upload(filePath, {
+      destination: fileName,
+    });
+    console.log(`File ${fileName} uploaded to ${bucketName}`);
+  }
 }
 
 // const ffmpegProcess = ffmpeg(cameraUrl)
