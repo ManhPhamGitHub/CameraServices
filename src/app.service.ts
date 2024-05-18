@@ -60,6 +60,10 @@ export class CameraService {
       })
       .on('start', (commandLine) => {
         console.log('Spawned FFmpeg with command:', commandLine);
+        console.log(
+          'this.storage.bucket(this.bucketName);',
+          this.storage.bucket(this.bucketName),
+        );
       })
       .on('end', async () => {
         console.log('FFmpeg process finished');
@@ -127,6 +131,8 @@ export class CameraService {
     folderName: string,
   ) {
     try {
+      console.log('uploadToGoogleCloud progress');
+
       const bucket = this.storage.bucket(this.bucketName);
 
       const destination = `${folderName}/${fileName}`;
