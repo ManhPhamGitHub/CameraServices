@@ -139,6 +139,7 @@ export class CameraService {
   ) {
     try {
       console.log('uploadToGoogleCloud progress');
+      await fs.promises.access(filePath, fs.constants.F_OK);
 
       const bucket = this.storage.bucket(this.bucketName);
 
@@ -148,8 +149,12 @@ export class CameraService {
         destination,
       });
       console.log(`File uploaded to ${destination}`);
-    } catch (error) {
-      console.log('Error uploading to Google Cloud:', error);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        console.error('File does not exist, skipping upload.');
+      } else {
+        console.error('Error:', err);
+      }
     }
   }
 }
