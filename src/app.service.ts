@@ -60,11 +60,6 @@ export class CameraService {
       })
       .on('start', async (commandLine) => {
         console.log('Spawned FFmpeg with command:', commandLine);
-        await this.uploadToGoogleCloud(
-          outputFilePath,
-          fileName,
-          `${year}-${month}-${day}`,
-        );
       })
       .on('end', async () => {
         console.log('FFmpeg process finished');
