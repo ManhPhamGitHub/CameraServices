@@ -36,9 +36,12 @@ export class CameraService {
 
     const formattedDate = `${year}-${month}-${day}_${hours}`;
     const fileName = `output_${formattedDate}.mp4`;
+    const fileNamePreviousHours = `output_${formattedDate}.mp4`;
 
     // Upload the recorded MP4 file to Cloudinary with the generated filename
     const outputFilePath = join(folderPath, fileName);
+    const outputFilePathPreviousHour = join(folderPath, fileNamePreviousHours);
+
     console.log('outputFilePath', outputFilePath);
 
     // Create an ffmpeg process to read from the camera URL
@@ -60,6 +63,14 @@ export class CameraService {
       })
       .on('start', async (commandLine) => {
         console.log('Spawned FFmpeg with command:', commandLine);
+
+        await this.uploadToGoogleCloud(
+          outputFilePathPreviousHour,
+          fileNamePreviousHours,
+          `${year}-${month}-${day}`,
+        );
+        // Handle Cloudinary upload result as needed
+        fs.unlinkSync(outputFilePathPreviousHour);
       })
       .on('end', async () => {
         console.log('FFmpeg process finished');
