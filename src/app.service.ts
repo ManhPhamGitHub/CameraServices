@@ -58,11 +58,12 @@ export class CameraService {
         stream.end();
         // reject(err); // Reject the promise on error
       })
-      .on('start', (commandLine) => {
+      .on('start', async (commandLine) => {
         console.log('Spawned FFmpeg with command:', commandLine);
-        console.log(
-          'this.storage.bucket(this.bucketName);',
-          this.storage.bucket(this.bucketName),
+        await this.uploadToGoogleCloud(
+          outputFilePath,
+          fileName,
+          `${year}-${month}-${day}`,
         );
       })
       .on('end', async () => {
