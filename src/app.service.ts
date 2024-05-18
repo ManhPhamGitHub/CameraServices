@@ -74,18 +74,6 @@ export class CameraService {
       .on('end', async () => {
         console.log('FFmpeg process finished');
         // resolve(); // Resolve the promise on completion
-        try {
-          // Upload the recorded MP4 file to Cloudinary
-          await this.uploadToGoogleCloud(
-            outputFilePath,
-            fileName,
-            `${year}-${month}-${day}`,
-          );
-          // Handle Cloudinary upload result as needed
-          fs.unlinkSync(outputFilePath);
-        } catch (err) {
-          console.error('Error uploading to Cloudinary:', err);
-        }
       });
 
     await ffmpegCommand.run(stream);
