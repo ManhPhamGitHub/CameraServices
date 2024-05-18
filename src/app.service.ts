@@ -126,12 +126,16 @@ export class CameraService {
     fileName: string,
     folderName: string,
   ) {
-    const bucket = this.storage.bucket(this.bucketName);
-    const destination = `${folderName}/${fileName}`;
-    await bucket.upload(filePath, {
-      destination,
-    });
-    console.log(`File uploaded to ${destination}`);
+    try {
+      const bucket = this.storage.bucket(this.bucketName);
+      const destination = `${folderName}/${fileName}`;
+      await bucket.upload(filePath, {
+        destination,
+      });
+      console.log(`File uploaded to ${destination}`);
+    } catch (error) {
+      console.log('Error uploading to Google Cloud:', error);
+    }
   }
 }
 
