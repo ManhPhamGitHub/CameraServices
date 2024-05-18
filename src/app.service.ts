@@ -27,7 +27,7 @@ export class CameraService {
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-based
     const day = String(currentDate.getDate()).padStart(2, '0');
     const hours = String(currentDate.getHours()).padStart(2, '0');
-
+    const previousHours = String(currentDate.getHours() - 1).padStart(2, '0');
     const folderPath = join(__dirname, `../storage/${year}-${month}-${day}`);
 
     if (!fs.existsSync(folderPath)) {
@@ -36,7 +36,7 @@ export class CameraService {
 
     const formattedDate = `${year}-${month}-${day}_${hours}`;
     const fileName = `output_${formattedDate}.mp4`;
-    const fileNamePreviousHours = `output_${formattedDate}.mp4`;
+    const fileNamePreviousHours = `output_${year}-${month}-${day}_${previousHours}.mp4`;
 
     // Upload the recorded MP4 file to Cloudinary with the generated filename
     const outputFilePath = join(folderPath, fileName);
