@@ -70,7 +70,6 @@ export class CameraService {
           `${year}-${month}-${day}`,
         );
         // Handle Cloudinary upload result as needed
-        fs.unlinkSync(outputFilePathPreviousHour);
       })
       .on('end', async () => {
         console.log('FFmpeg process finished');
@@ -149,6 +148,8 @@ export class CameraService {
         destination,
       });
       console.log(`File uploaded to ${destination}`);
+
+      fs.unlinkSync(filePath);
     } catch (err) {
       if (err.code === 'ENOENT') {
         console.error('File does not exist, skipping upload.');
