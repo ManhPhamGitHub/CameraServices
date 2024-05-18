@@ -128,7 +128,9 @@ export class CameraService {
   ) {
     try {
       const bucket = this.storage.bucket(this.bucketName);
+
       const destination = `${folderName}/${fileName}`;
+      console.log('bucketbucket', bucket, destination);
       await bucket.upload(filePath, {
         destination,
       });
