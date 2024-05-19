@@ -51,7 +51,7 @@ export class CameraService {
         '-c:v libx264',
         '-vf scale=1280:720',
         '-f segment',
-        '-segment_time 3000',
+        '-segment_time 3600',
         '-reset_timestamps 1',
         '-strftime 1',
       ])
