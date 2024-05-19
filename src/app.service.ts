@@ -51,7 +51,11 @@ export class CameraService {
         '-c:v libx264',
         '-vf scale=1280:720',
         '-f segment',
-        '-segment_time 3000',
+        '-segment_time 120',
+        '-segment_list pipe:1',
+        '-segment_list_type csv',
+        '-segment_format mp4',
+        '-map 0',
         '-reset_timestamps 1',
         '-strftime 1',
       ])
@@ -125,7 +129,7 @@ export class CameraService {
     folderName: string,
   ) {
     try {
-      console.log('uploadToGoogleCloud progress');
+      console.log('uploadToGoogleCloud progress => ', filePath);
       await fs.promises.access(filePath, fs.constants.F_OK);
 
       const bucket = this.storage.bucket(this.bucketName);
@@ -133,6 +137,9 @@ export class CameraService {
       const destination = `${folderName}/${fileName}`;
       await bucket.upload(filePath, {
         destination,
+        metadata: {
+          contentType: 'video/mp4',
+        },
       });
       console.log(`File uploaded to ${destination}`);
 
