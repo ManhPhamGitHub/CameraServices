@@ -27,7 +27,7 @@ export class CameraService {
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-based
     const day = String(currentDate.getDate()).padStart(2, '0');
     const hours = String(currentDate.getHours()).padStart(2, '0');
-    const previousHours = String(currentDate.getHours() - 1).padStart(2, '0');
+    const previousHours = String(currentDate.getHours() - 2).padStart(2, '0');
     const folderPath = join(__dirname, `../storage/${year}-${month}-${day}`);
 
     if (!fs.existsSync(folderPath)) {
@@ -136,7 +136,7 @@ export class CameraService {
       });
       console.log(`File uploaded to ${destination}`);
 
-      fs.unlinkSync(filePath);
+      await fs.unlinkSync(filePath);
     } catch (err) {
       if (err.code === 'ENOENT') {
         console.error('File does not exist, skipping upload.');
