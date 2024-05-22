@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { CameraService } from 'src/app.service';
+import { mockData } from 'src/constant';
 @Injectable()
 export class TasksService implements OnModuleInit {
   constructor(private readonly cameraService: CameraService) {}
@@ -18,16 +19,7 @@ export class TasksService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
-    const mockData = [
-      {
-        cameraUrl: 'rtsp://rtsp-test-server.viomic.com:554/stream',
-        name: 'Camera_1',
-      },
-      {
-        cameraUrl: 'rtsp://rtsp-test-server.viomic.com:554/stream',
-        name: 'Camera_2',
-      },
-    ];
+
     mockData.forEach(async (camera) => {
       await this.cameraService.startStreaming(camera.cameraUrl, camera.name);
     });
