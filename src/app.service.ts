@@ -19,7 +19,7 @@ export class CameraService {
     });
   }
 
-  async startStreaming(cameraUrl: string): Promise<void> {
+  async startStreaming(cameraUrl: string, name: string): Promise<void> {
     const stream = new PassThrough();
     const currentDate = new Date();
 
@@ -35,8 +35,8 @@ export class CameraService {
     }
 
     const formattedDate = `${year}-${month}-${day}_${hours}`;
-    const fileName = `output_${formattedDate}.mp4`;
-    const fileNamePreviousHours = `output_${year}-${month}-${day}_${previousHours}.mp4`;
+    const fileName = `${name}_${formattedDate}.mp4`;
+    const fileNamePreviousHours = `${name}_${year}-${month}-${day}_${previousHours}.mp4`;
 
     // Upload the recorded MP4 file to Cloudinary with the generated filename
     const outputFilePath = join(folderPath, fileName);

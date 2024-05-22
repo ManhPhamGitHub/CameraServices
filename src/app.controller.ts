@@ -7,7 +7,18 @@ export class AppController {
 
   @Get()
   async getHello() {
-    const cameraUrl = 'rtsp://rtsp-test-server.viomic.com:554/stream';
-    await this.appService.startStreaming(cameraUrl);
+    const mockData = [
+      {
+        cameraUrl: 'rtsp://rtsp-test-server.viomic.com:554/stream',
+        name: 'Camera_1',
+      },
+      {
+        cameraUrl: 'rtsp://rtsp-test-server.viomic.com:554/stream',
+        name: 'Camera_2',
+      },
+    ];
+    mockData.forEach((camera) => {
+      this.appService.startStreaming(camera.cameraUrl, camera.name);
+    });
   }
 }
