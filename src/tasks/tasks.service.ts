@@ -21,7 +21,11 @@ export class TasksService implements OnModuleInit {
     const mockData = [
       {
         cameraUrl: 'rtsp://rtsp-test-server.viomic.com:554/stream',
-        name: ' Camera 1',
+        name: 'Camera_1',
+      },
+      {
+        cameraUrl: 'rtsp://rtsp-test-server.viomic.com:554/stream',
+        name: 'Camera_2',
       },
     ];
     mockData.forEach(async (camera) => {
