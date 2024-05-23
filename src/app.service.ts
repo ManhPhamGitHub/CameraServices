@@ -139,7 +139,7 @@ export class CameraService {
       });
       console.log(`File uploaded to ${destination}`);
 
-      await fs.unlinkSync(filePath);
+      await fs.promises.unlink(filePath);
     } catch (err) {
       if (err.code === 'ENOENT') {
         console.error('File does not exist, skipping upload.');
