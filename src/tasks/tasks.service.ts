@@ -18,7 +18,8 @@ export class TasksService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
-    const cameraUrl = 'rtsp://rtsp-test-server.viomic.com:554/stream'; // Replace with your RTSP URL
+    // const cameraUrl = 'rtsp://rtsp-test-server.viomic.com:554/stream'; // Replace with your RTSP URL
+    const cameraUrl = 'rtsp://rtspstream:585ec393e50c3cc0b554420a881842cb@zephyr.rtsp.stream/pattern'
     await this.cameraService.startStreaming(cameraUrl);
   }
 }
