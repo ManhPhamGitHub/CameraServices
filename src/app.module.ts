@@ -13,7 +13,7 @@ import { join } from 'path';
     ScheduleModule.forRoot(),
     TasksModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'storage'),
+      rootPath: join(__dirname, '..', 'storage'),
       serveRoot: '/storage',
     }),
   ],
