@@ -37,25 +37,44 @@ export class CameraService {
     const formattedDate = `${year}-${month}-${day}_${hours}`;
     const fileName = `output_${formattedDate}.mp4`;
     const fileNamePreviousHours = `output_${year}-${month}-${day}_${previousHours}.mp4`;
+    const playlistName = `output_${formattedDate}.m3u8`;
+    const playlistNamePreviousHours = `output_${year}-${month}-${day}_${previousHours}.m3u8`;
 
+    const segmentFileName = `segment_${formattedDate}_%03d.ts`;
+    const playlistPath = join(folderPath, playlistName);
+    const playlistPathPreviousHours = join(
+      folderPath,
+      playlistNamePreviousHours,
+    );
+
+    const segmentPath = join(folderPath, segmentFileName);
     // Upload the recorded MP4 file to Cloudinary with the generated filename
     const outputFilePath = join(folderPath, fileName);
     const outputFilePathPreviousHour = join(folderPath, fileNamePreviousHours);
 
-    console.log('outputFilePath', outputFilePath);
-
     // Create an ffmpeg process to read from the camera URL
     const ffmpegCommand = ffmpeg(cameraUrl)
       .inputOptions(['-rtsp_transport tcp'])
+      // .outputOptions([
+      //   '-c:v libx264',
+      //   '-vf scale=1280:720',
+      //   '-f segment',
+      //   '-segment_time 3600',
+      //   '-reset_timestamps 1',
+      //   '-strftime 1',
+      // ])
       .outputOptions([
         '-c:v libx264',
         '-vf scale=1280:720',
-        '-f segment',
-        '-segment_time 3600',
-        '-reset_timestamps 1',
-        '-strftime 1',
+        '-f hls',
+        '-hls_time 2',
+        '-hls_list_size 5',
+        '-hls_flags delete_segments',
+        `-hls_segment_filename ${segmentPath}`,
       ])
-      .output(outputFilePath)
+      .output(playlistPath)
+
+      // .output(outputFilePath)
       .on('error', (err) => {
         console.error('FFmpeg error:', err);
         stream.end();
@@ -65,8 +84,8 @@ export class CameraService {
         console.log('Spawned FFmpeg with command:', commandLine);
 
         await this.uploadToGoogleCloud(
-          outputFilePathPreviousHour,
-          fileNamePreviousHours,
+          playlistPathPreviousHours,
+          playlistNamePreviousHours,
           `${year}-${month}-${day}`,
         );
         // Handle Cloudinary upload result as needed
@@ -77,29 +96,8 @@ export class CameraService {
       });
 
     await ffmpegCommand.run(stream);
-
-    // try {
-    //   Cloudinary.uploader
-    //     .upload_stream(
-    //       { resource_type: 'video', folder: folderName },
-    //       (error, result) => {
-    //         if (error) {
-    //           console.error('Error uploading segment to Cloudinary:', error);
-    //         } else {
-    //           console.log(
-    //             `Segment uploaded to Cloudinary successfully: ${result.secure_url}`,
-    //           );
-    //         }
-    //       },
-    //     )
-    //     .end(data);
-    // } catch (error) {
-    //   console.error('Error uploading segment to Cloudinary:', error);
-    // }
-    // });
-
-    // Handle cleanup or additional logic as needed
   }
+
 
   uploadToCloudinary = (filePath) => {
     return new Promise((resolve, reject) => {
