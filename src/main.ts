@@ -4,9 +4,10 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
 
   // app.useStaticAssets(join(__dirname, '..', 'storage'));
+  app.enableCors();
 
   await app.listen(3456);
 }

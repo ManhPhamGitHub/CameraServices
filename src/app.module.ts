@@ -12,10 +12,10 @@ import { join } from 'path';
   imports: [
     ScheduleModule.forRoot(),
     TasksModule,
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'storage'),
-    //   serveRoot: '/storage',
-    // }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'storage'),
+      serveRoot: '/storage/',
+    }),
   ],
 })
 export class AppModule {}
