@@ -14,6 +14,7 @@ import { join } from 'path';
     TasksModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'storage'),
+      serveRoot: '/storage',
     }),
   ],
 })

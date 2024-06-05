@@ -6,7 +6,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.useStaticAssets(join(__dirname, '..', 'storage'));
+  // app.useStaticAssets(join(__dirname, '..', 'storage'));
 
   await app.listen(3456);
 }
