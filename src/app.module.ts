@@ -13,11 +13,9 @@ import { join } from 'path';
     ScheduleModule.forRoot(),
     TasksModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'storage'),
-      serveRoot: '/storage/',
+      rootPath: join(__dirname, '..', '..', 'storage'),
+      serveRoot: '/storage',
     }),
   ],
 })
-
-
 export class AppModule {}
