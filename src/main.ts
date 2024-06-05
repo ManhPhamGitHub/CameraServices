@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  console.log(33333333333, join(__dirname, '..', 'storage'));
 
   // app.useStaticAssets(join(__dirname, '..', 'storage'));
   app.enableCors();
