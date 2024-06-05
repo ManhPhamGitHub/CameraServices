@@ -26,6 +26,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^4.0.2",
+    "@nestjs/serve-static": "^4.0.2",
     "cloudinary": "^2.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "reflect-metadata": "^0.2.0",
