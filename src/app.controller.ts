@@ -7,7 +7,7 @@ export class AppController {
 
   @Get()
   async getHello() {
-    const cameraUrl = 'rtsp://rtspstream:585ec393e50c3cc0b554420a881842cb@zephyr.rtsp.stream/pattern';
+    const cameraUrl = 'rtsp://rtsp.stream/movie';
     await this.appService.startStreaming(cameraUrl);
   }
 }
