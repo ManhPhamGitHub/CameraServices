@@ -6,7 +6,6 @@ import { v2 as Cloudinary } from 'cloudinary';
 import { Storage } from '@google-cloud/storage';
 import { join } from 'path';
 import * as fs from 'fs';
-
 @Injectable()
 export class CameraService {
   private storage;
@@ -15,7 +14,7 @@ export class CameraService {
     this.storage = new Storage({
       projectId: 'fir-a5cfe',
       keyFilename:
-        '/root/manhpham/CameraServices/src/secret/fir-a5cfe-b582bda476a7.json',
+        '/home/manhpd/manh.pd/test/CameraServices/secret/fir-a5cfe-b582bda476a7.json',
     });
   }
 
@@ -28,7 +27,10 @@ export class CameraService {
     const day = String(currentDate.getDate()).padStart(2, '0');
     const hours = String(currentDate.getHours()).padStart(2, '0');
     const previousHours = String(currentDate.getHours() - 2).padStart(2, '0');
-    const folderPath = join(__dirname, `../storage/${year}-${month}-${day}`);
+    const folderPath = join(
+      __dirname,
+      `../storage/${year}-${month}-${day}/${previousHours}`,
+    );
 
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath, { recursive: true });
@@ -84,8 +86,8 @@ export class CameraService {
         console.log('Spawned FFmpeg with command:', commandLine);
 
         await this.uploadToGoogleCloud(
-          playlistPathPreviousHours,
-          playlistNamePreviousHours,
+          folderPath,
+          hours,
           `${year}-${month}-${day}`,
         );
         // Handle Cloudinary upload result as needed
@@ -97,7 +99,6 @@ export class CameraService {
 
     await ffmpegCommand.run(stream);
   }
-
 
   uploadToCloudinary = (filePath) => {
     return new Promise((resolve, reject) => {
@@ -117,30 +118,46 @@ export class CameraService {
     });
   };
 
-  private async uploadToGoogleCloud(
-    filePath: string,
-    fileName: string,
-    folderName: string,
-  ) {
+  private async uploadToGoogleCloud(folderPath, previousHours, previousDate) {
     try {
-      console.log('uploadToGoogleCloud progress => ', filePath);
-      await fs.promises.access(filePath, fs.constants.F_OK);
-
-      const bucket = this.storage.bucket(this.bucketName);
-
-      const destination = `${folderName}/${fileName}`;
-      await bucket.upload(filePath, {
-        destination,
-        metadata: {
-          contentType: 'video/mp4',
+      await this.storage.bucket(this.bucketName).setCorsConfiguration([
+        {
+          maxAgeSeconds: 3600,
+          method: ['*'],
+          origin: ['*'],
+          responseHeader: ['*'],
         },
-      });
-      console.log(`File uploaded to ${destination}`);
+      ]);
+      // const destination = `${folderName}/${hours}}`;
 
-      await fs.unlinkSync(filePath);
+      // console.log('uploadToGoogleCloud progress => ', filePath, destination);
+      // await fs.promises.access(filePath, fs.constants.F_OK);
+
+      // const bucket = this.storage.bucket(this.bucketName);
+
+      // await bucket.upload(filePath, {
+      //   destination,
+      //   metadata: {
+      //     contentType: 'video/mp4',
+      //   },
+      // });
+      // console.log(`File uploaded to ${destination}`);
+
+      console.log('folderPath', folderPath);
+
+      const files = fs.readdirSync(folderPath);
+
+      for (const file of files) {
+        const filePath = join(folderPath, file);
+        await this.storage.bucket(this.bucketName).upload(filePath, {
+          destination: `${previousDate}/${previousHours}/${file}`, // Adjust the destination as needed
+        });
+        console.log(`${filePath} uploaded to ${this.bucketName}`);
+        await fs.unlinkSync(filePath);
+      }
     } catch (err) {
       if (err.code === 'ENOENT') {
-        console.error('File does not exist, skipping upload.');
+        console.error('File does not exist, skipping upload.', err);
       } else {
         console.error('Error:', err);
       }
